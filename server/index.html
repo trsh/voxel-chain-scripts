@@ -1,0 +1,58 @@
+<html>
+
+<head></head>
+
+<body>
+    Check console!
+    <script>
+
+        // TODO: userId should come from user session in backend
+        const params = (new URL(document.location)).searchParams;
+        const userId = params.get("userId");
+        const baseUrl = 'http://localhost:3000';
+
+        async function connnectAndListen() {
+            try {
+                const response = await fetch(`${baseUrl}/updates?userId=${userId}`);
+
+                if (!response.ok) {
+                    console.error(response.status);
+                    setTimeout(connnectAndListen, 5000);
+                    return;
+                }
+
+
+                for (const reader = response.body.getReader(); ;) {
+                    const { value, done } = await reader.read();
+
+                    if (done) {
+                        break;
+                    }
+
+                    const updateBody = new TextDecoder().decode(value);
+                    const updatedScriptUrl = `${baseUrl}/${userId}/${updateBody}?userId=${userId}`;
+                    const oldScript = document.getElementById('main');
+                    oldScript.remove();
+
+                    var updatedScript = document.createElement('script');
+                    updatedScript.setAttribute("id", "main");
+                    updatedScript.setAttribute("type", "module");
+                    updatedScript.src = updatedScriptUrl;
+                    document.body.appendChild(updatedScript);
+                }
+            } catch (e) {
+                // TODO check for network error
+                console.error(e);
+                setTimeout(connnectAndListen, 5000);
+            };
+        }
+
+        (async () => {
+            connnectAndListen();
+        })();
+
+    </script>
+    <script id="main"></script>
+</body>
+
+</html>

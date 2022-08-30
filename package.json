@@ -17,26 +17,31 @@
     "eslint": "~8.23",
     "eslint-config-prettier": "~8.5",
     "eslint-plugin-jest": "~27.0",
+    "express": "^4.18.1",
+    "findit": "^2.0.0",
     "form-data": "^4.0.0",
     "jest": "~28.1",
+    "multer": "^1.4.5-lts.1",
     "prettier": "~2.7",
     "rimraf": "~3.0",
     "ts-jest": "~28.0",
     "tsc-watch": "^5.0.3",
     "tsutils": "~3.21",
-    "typescript": "~4.7"
+    "typescript": "~4.7",
+    "unzipper": "^0.10.11"
   },
   "scripts": {
     "start": "",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
     "build": "tsc -p tsconfig.json",
-    "build:watch": "tsc-watch -w -p tsconfig.json --onSuccess \"node ./transfer.js\"",
+    "build:watch": "tsc-watch -w -p tsconfig.json --onSuccess \"node ./sync/transfer.js\"",
     "build:release": "npm run clean && tsc -p tsconfig.release.json",
     "lint": "eslint . --ext .ts --ext .mts",
     "test": "jest",
     "prettier": "prettier --config .prettierrc --write .",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "server": "node ./server/main.js"
   },
   "author": "Janis Taranda",
   "dependencies": {

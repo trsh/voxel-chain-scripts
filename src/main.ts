@@ -10,5 +10,7 @@ export function sum(a: number, b: number): number {
  * Main entry point executet by engine
  */
 export function main(): void {
-  sum(1, 4);
+  console.log(sum(3, 3));
 }
+
+main();

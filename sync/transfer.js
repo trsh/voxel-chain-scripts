@@ -10,7 +10,7 @@ const config = JSON.parse(
   )
 );
 
-const SERVER_URL = 'https://example333.com';
+const SERVER_URL = 'http://localhost:3000';
 
 /**
  * @param {String} sourceDir: /some/folder/to/compress
@@ -41,8 +41,9 @@ await zipDirectory('./build/src/', zipPath);
 const form = new FormData();
 form.append('file', fs.createReadStream(zipPath));
 
+
 // Prepeare headers and credentials
-const basicHash = Buffer.from(`${config.user}.${config.secret}`).toString('base64');
+const basicHash = Buffer.from(`${config.userId}:${config.secret}`).toString('base64');
 const request_config = {
   headers: {
     'Authorization': `Basic ${basicHash}`,
