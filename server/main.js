@@ -39,8 +39,9 @@ const storage = multer.diskStorage({
 app.use((req, res, next) => {
   const worldId = req.query.worldId;
 
-  if (!worldId) {
-    return res.status(400).send('WorldId not specified');
+  // TODO: real world id check from session
+  if (!worldId || worldId !== '1') {
+    return res.status(400).send('Invalid WorldId');
   }
 
   req['worldId'] = worldId;
