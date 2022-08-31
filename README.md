@@ -12,5 +12,5 @@ What is happening:
 1) User edits typescript source
 2) It is compiled to js and ziped
 3) Sent to server
-4) Server unzips and puts in file tree structure
-5) Server notifies it's client to refresh with this new javascript
+4) Server unzips and puts script in file tree structure
+5) Server notifies it's client to refresh with this new script
