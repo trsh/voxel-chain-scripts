@@ -1,11 +1,4 @@
 /**
- * Dummy function to demonstrate jest
- */
-export function sum(a: number, b: number): number {
-  return a + b;
-}
-
-/**
  * Main entry point executet by engine
  */
 function main(): void {

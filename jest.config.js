@@ -4,7 +4,7 @@ export default {
   globals: {
     'ts-jest': {
       useESM: true,
-    },
+    }
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.(m)?js$': '$1',

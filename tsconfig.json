@@ -19,6 +19,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }
