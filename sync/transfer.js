@@ -18,7 +18,7 @@ const SERVER_URL = 'http://localhost:3000';
  * @returns {Promise}
  */
 async function zipDirectory(sourceDir, outPath) {
-  const archive = archiver('zip', { zlib: { level: 9 } });
+  const archive = archiver('zip', { zlib: { level: 3 } });
   const stream = fs.createWriteStream(outPath);
 
   return new Promise((resolve, reject) => {

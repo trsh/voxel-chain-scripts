@@ -1,12 +1,16 @@
+import { sum } from './math';
+
 /**
  * Main entry point executet by engine
  */
 function main(): void {
   const graphics = new PIXI.Graphics();
 
+  const x = sum(1,2);
+
   // Rectangle
   graphics.beginFill(0xDE3249);
-  graphics.drawRect(50, 50, 100, 100);
+  graphics.drawRect(x, 110, 100, 100);
   graphics.endFill();
 
   // Rectangle + line style 1

@@ -100,11 +100,13 @@ app.get("/updates", (req, res) => {
 
   const storeDir = path.join(wordScriptsDir, userId, worldId);
 
-  fs.readdirSync(storeDir).forEach(file => {
-    if (file === 'main.js') {
-      res.write(file);
-    }
-  });
+  if (fs.existsSync(storeDir)) {
+    fs.readdirSync(storeDir).forEach(file => {
+      if (file === 'main.js') {
+        res.write(file);
+      }
+    });
+  }
 
   const interval = setInterval(() => {
     if (updated[userId]) {
@@ -112,7 +114,7 @@ app.get("/updates", (req, res) => {
       delete updated[userId];
       res.write(mainFileWithoutCache);
     }
-  }, 3000);
+  }, 1500);
 
   res.on("close", () => {
     clearInterval(interval);
