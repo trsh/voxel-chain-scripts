@@ -1,6 +1,10 @@
 <html>
 
-<head></head>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.2/browser/pixi.min.js"
+        integrity="sha512-PSn5cMYVrLd/1XFNS8X3WCVIkOuD5vzyww0t9/65Nw0OD0WCYmYBuIkCERtObyVi2HCAIGnHOL+BvkBD4jUevw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
 
 <body>
     Check console!
@@ -9,11 +13,16 @@
         // TODO: userId should come from user session in backend
         const params = (new URL(document.location)).searchParams;
         const userId = params.get("userId");
+        const worldId = params.get("worldId");
         const baseUrl = 'http://localhost:3000';
+
+        const app = new PIXI.Application({ antialias: true });
+        document.body.appendChild(app.view);
+        const stage = app.stage;
 
         async function connnectAndListen() {
             try {
-                const response = await fetch(`${baseUrl}/updates?userId=${userId}`);
+                const response = await fetch(`${baseUrl}/updates?userId=${userId}&worldId=${worldId}`);
 
                 if (!response.ok) {
                     console.error(response.status);
@@ -29,16 +38,21 @@
                         break;
                     }
 
+                    const timeStamp = Date.now();
                     const updateBody = new TextDecoder().decode(value);
-                    const updatedScriptUrl = `${baseUrl}/${userId}/${updateBody}?userId=${userId}`;
+                    const updatedScriptUrl = `${baseUrl}/${userId}/${worldId}/${updateBody}?userId=${userId}&worldId=${worldId}&t=${timeStamp}`;
                     const oldScript = document.getElementById('main');
                     oldScript.remove();
+
+                    for (var i = stage.children.length - 1; i >= 0; i--) {	stage.removeChild(stage.children[i]);};
 
                     var updatedScript = document.createElement('script');
                     updatedScript.setAttribute("id", "main");
                     updatedScript.setAttribute("type", "module");
                     updatedScript.src = updatedScriptUrl;
                     document.body.appendChild(updatedScript);
+
+                    console.log('Running new script...');
                 }
             } catch (e) {
                 // TODO check for network error

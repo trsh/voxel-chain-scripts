@@ -13,6 +13,7 @@
     "@typescript-eslint/parser": "~5.35",
     "archiver": "^5.3.1",
     "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
     "editorconfig": "^0.15.3",
     "eslint": "~8.23",
     "eslint-config-prettier": "~8.5",
@@ -45,6 +46,7 @@
   },
   "author": "Janis Taranda",
   "dependencies": {
+    "pixi.js": "^6.5.2",
     "tslib": "~2.4"
   }
 }

@@ -18,10 +18,10 @@ let updated = {};
 const storage = multer.diskStorage({
   destination: function (req, _file, cb) {
     const userId = req['userId'];
-    const storeDir = path.join(wordScriptsDir, `${userId}`);
+    const storeDir = path.join(wordScriptsDir, userId, req['worldId']);
 
     if (!fs.existsSync(storeDir)) {
-      fs.mkdirSync(storeDir);
+      fs.mkdirSync(storeDir, { recursive: true });
     } else {
       rimraf.sync(`${storeDir}/*`);
     }
@@ -37,42 +37,51 @@ const storage = multer.diskStorage({
 })
 
 app.use((req, res, next) => {
-  // TODO: here we should also check for real user session and userId
-  if (req.method === 'GET') {
-    const userId = req.query.userId;
+  const worldId = req.query.worldId;
 
-    if (!userId) {
+  if (!worldId) {
+    return res.status(400).send('WorldId not specified');
+  }
+
+  req['worldId'] = worldId;
+
+  // NOTE: Assuming that post event will come only from Script sync client
+  if (req.method === 'POST') {
+    // Check for basic auth header
+    if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
+      return res.status(401).send('Missing Authorization Header');
+    }
+
+    // Verify auth credentials
+    const base64Credentials = req.headers.authorization.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [userId, secret] = credentials.split(':');
+
+    // TODO: Here we should call real authorization method
+    if (userId !== '1' || secret !== '123') {
       return res.status(401).send('Invalid Authentication Credentials');
     }
 
     req['userId'] = userId;
-    return next();
+    next()
+  } else {
+    // TODO: here we should also check for real user session and userId
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).send('Invalid request params');
+    }
+
+    req['userId'] = userId;
+    next();
   }
-
-  // Check for basic auth header
-  if (!req.headers.authorization || req.headers.authorization.indexOf('Basic ') === -1) {
-    return res.status(401).send('Missing Authorization Header');
-  }
-
-  // Verify auth credentials
-  const base64Credentials = req.headers.authorization.split(' ')[1];
-  const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-  const [userId, secret] = credentials.split(':');
-
-  // TODO: Here we should call real authorization method
-  if (userId !== '1' || secret !== '123') {
-    return res.status(401).send('Invalid Authentication Credentials');
-  }
-
-  req['userId'] = userId;
-  next()
 })
 
 const upload = multer({ storage: storage });
 
 app.post('/', upload.single('file'), (req, res) => {
 
-  if (req['userId'] && req['upFile'] && req['upDir']) {
+  if (req['userId'] && req['worldId'] && req['upFile'] && req['upDir']) {
     const userId = req['userId'];
     const unzipPath = path.join(__dirname, req['upDir']);
     const zipPath = path.join(unzipPath, req['upFile']);
@@ -82,10 +91,7 @@ app.post('/', upload.single('file'), (req, res) => {
       .promise()
       .then(() => {
         fs.unlinkSync(zipPath);
-        const timeStamp = Date.now();
-        const mainFileWithoutCache = `main-${timeStamp}.js`;
-        fs.renameSync(path.join(unzipPath, 'main.js'), path.join(unzipPath, mainFileWithoutCache));
-        updated[userId] = mainFileWithoutCache;
+        updated[userId] = 'main.js';
         res.send('OK');
       }).catch((e) => {
         const errMsg = e.message || String(e);
@@ -105,9 +111,12 @@ app.get('/', (_req, res) => {
 
 app.get("/updates", (req, res) => {
   const userId = req['userId'];
+  const worldId = req['worldId'];
 
-  if (!userId) {
-    res.status(500).send('User ID not present');
+  if (!userId || !worldId) {
+    const errMsg = 'User ID/ World ID not present';
+    console.error(errMsg);
+    res.status(500).send(errMsg);
     return;
   }
 
@@ -117,12 +126,13 @@ app.get("/updates", (req, res) => {
     "Connection": "keep-alive",
     "Content-Type": "text/event-stream",
   });
+
   res.flushHeaders();
 
-  const storeDir = path.join(wordScriptsDir, `${userId}`);
+  const storeDir = path.join(wordScriptsDir, userId, worldId);
 
   fs.readdirSync(storeDir).forEach(file => {
-    if (file.startsWith('main-') && path.extname(file) === '.js') {
+    if (file === 'main.js') {
       res.write(file);
     }
   });

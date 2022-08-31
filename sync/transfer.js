@@ -54,7 +54,7 @@ const request_config = {
 console.log('Syncing scripts...');
 
 // Send file
-axios.post(SERVER_URL, form, request_config).then(function (response) {
+axios.post(`${SERVER_URL}?worldId=${config.worldId}`, form, request_config).then(function (response) {
   if (response.status === 200) {
     console.log('Scripts were synced!');
   } else {
