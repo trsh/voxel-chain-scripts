@@ -152,7 +152,7 @@ app.get("/updates", (req, res) => {
   });
 })
 
-// TODO: this should be not statics, but check user session and grant or deny access to script
+// This is still filtered by auth middleware
 app.use(express.static('./server/upload/world-scripts'));
 
 app.listen(port, () => {
